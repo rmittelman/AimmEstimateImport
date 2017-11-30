@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Settings>
+  <setting name="POLSQL" value ="Data Source=POLSQL;Initial Catalog=MLG;User ID=polsqluser;Password=Pol113388"/>
+  <setting name="SourceFolder" value ="Z:\AIMM Automation\Estimate Import"/>
+  <setting name="ArchiveFolder" value ="Z:\AIMM Automation\Estimate Import\Archive"/>
+  <setting name="ErrorFolder" value ="Z:\AIMM Automation\Estimate Import\Errors"/>
+  <setting name="LogFolder" value ="Z:\AIMM Automation\Estimate Import\Logs"/>
+  <setting name="ShowExcel" value ="True"/>
+  <setting name="WorksheetName" value ="SPECS"/>
+</Settings>
