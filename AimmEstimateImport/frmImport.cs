@@ -3,6 +3,8 @@ using Aimm.Logging;
 using System.Windows.Forms;
 using System.Diagnostics;
 using System.IO;
+using System.Drawing;
+using System.Configuration;
 
 namespace AimmEstimateImport
 {
@@ -61,12 +63,29 @@ namespace AimmEstimateImport
         {
             LogIt.LogMethod();
 
+            // get form position and size, and apply
+            FormWindowState state = Properties.Settings.Default.wState;
+            Point location = Properties.Settings.Default.wLocation;
+            Size size = Properties.Settings.Default.wSize;
+            WindowState = state == FormWindowState.Minimized ? FormWindowState.Normal : state;
+            Location = location == new Point(0, 0) ? new Point(100, 100) : location;
+            Size = size == new Size(0, 0) ? new Size(1230, 413) : size;
+
             // set tooltips
             toolTip1.AutoPopDelay = 5000;
             toolTip1.InitialDelay = 1000;
             toolTip1.ReshowDelay = 500;
             toolTip1.SetToolTip(btnFindExcel, "Find Excel ECM File");
             toolTip1.SetToolTip(btnImport, "Import AIMM Estimate from Excel ECM File");
+        }
+
+        private void frmImport_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // save current position and normal size
+            Properties.Settings.Default.wState = WindowState;
+            Properties.Settings.Default.wLocation = WindowState == FormWindowState.Normal ? Location : RestoreBounds.Location;
+            Properties.Settings.Default.wSize = WindowState == FormWindowState.Normal ? Size : RestoreBounds.Size;
+            Properties.Settings.Default.Save();
         }
 
         private void btnFindExcel_Click(object sender, EventArgs e)
@@ -86,9 +105,10 @@ namespace AimmEstimateImport
 
         private void btnImport_Click(object sender, EventArgs e)
         {
-            imp.ImportExcel();
+            imp.ImportECM();
         }
 
         #endregion
+
     }
 }

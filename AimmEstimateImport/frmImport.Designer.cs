@@ -120,6 +120,7 @@
             this.Controls.Add(this.label1);
             this.Name = "frmImport";
             this.Text = "Import ECM to AIMM";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmImport_FormClosing);
             this.Load += new System.EventHandler(this.frmImport_Load);
             this.ResumeLayout(false);
             this.PerformLayout();

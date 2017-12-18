@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="clsCrypto.cs" />
     <Compile Include="clsExcel.cs" />
     <Compile Include="clsImport.cs" />
     <Compile Include="frmImport.cs">

@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Data;
 //using Excel = Microsoft.Office.Interop.Excel;
 
 namespace AimmEstimateImport
@@ -375,6 +376,60 @@ namespace AimmEstimateImport
             try
             {
                 result = rangeToCheck.Cells(xlApp.WorksheetFunction.Match(xlApp.WorksheetFunction.Max(rangeToCheck), rangeToCheck, 0));
+            }
+            catch(Exception ex)
+            {
+                LastError = ex.Message;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the cell containing the maximum value in the supplied range meeting criteria supplied
+        /// </summary>
+        /// <param name="rangeToCheck">Range of cells to search</param>
+        /// <param name="criteriaRange">Range of cells containing criteria (must be same size as rangeToCheck)</param>
+        /// <param name="criteria">Criteria to apply</param>
+        /// <returns></returns>
+        public dynamic GetMaxCellInRange(dynamic rangeToCheck, dynamic criteriaRange, string criteria)
+        {
+            dynamic result = null;
+            try
+            {
+                // can't use MAXIFS for older excel compatibility, so iterate range 
+                // and save largest cell that meets criteria
+                int maxCell = 0;
+                float maxVal = 0;
+                for(int i = 1; i <= rangeToCheck.Cells.Count; i++)
+                {
+                    var val = rangeToCheck.Cells[i].Value;
+                    string critVal = (criteriaRange.Cells[i].Value ?? 0).ToString();
+                    bool isTrue = false;
+
+                    // criteria
+                    using(var parser = new DataTable())
+                    {
+                        try
+                        {
+                            isTrue = (bool)parser.Compute($"{ critVal.ToString()}{criteria}", string.Empty);
+                        }
+                        catch(Exception ex)
+                        {
+                        }
+                    }
+                    //var parsingEngine = new DataTable(); //in System.Data
+                    //int i = (int)parsingEngine.Compute("3 + 4", String.Empty);
+                    //decimal d = (decimal)parsingEngine.Compute("3.45 * 76.9/3", String.Empty);
+
+
+
+                    if(isTrue && val > maxVal)
+                    {
+                        maxCell = i;
+                        maxVal = Convert.ToSingle(val);
+                    }
+                }
+                result = rangeToCheck.Cells[maxCell];
             }
             catch(Exception ex)
             {
