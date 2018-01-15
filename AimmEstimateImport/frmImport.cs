@@ -22,7 +22,8 @@ namespace AimmEstimateImport
             if(isIDE)
                 settingsPath = Path.GetDirectoryName(Application.ExecutablePath);
             else
-                settingsPath = Path.GetDirectoryName(Application.CommonAppDataPath);
+                settingsPath = Application.CommonAppDataPath.Remove(Application.CommonAppDataPath.LastIndexOf("."));
+                //settingsPath = Path.GetDirectoryName(Application.CommonAppDataPath);
             imp.InitClass(settingsPath);
         }
 
@@ -108,7 +109,11 @@ namespace AimmEstimateImport
             imp.ImportECM();
         }
 
-        #endregion
+        private void txtExcelFile_TextChanged(object sender, EventArgs e)
+        {
+            btnImport.Enabled = File.Exists(txtExcelFile.Text);
+        }
 
+        #endregion
     }
 }

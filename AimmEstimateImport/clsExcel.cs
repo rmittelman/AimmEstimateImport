@@ -106,9 +106,20 @@ namespace AimmEstimateImport
         /// <returns></returns>
         public bool SaveWorkbookAs(string fileName, XlFileFormat fileFormat = XlFileFormat.xlOpenXMLWorkbook)
         {
-            xlWorkbook.SaveAs(fileName, fileFormat);
-            return true;
-        }
+            bool result = false;
+            try
+            {
+                xlWorkbook.SaveAs(fileName, fileFormat);
+                result = true;
+
+            }
+            catch(Exception ex )
+            {
+                LastError = $"Error saving excel file: {ex.Message}";
+                result = false;
+            }
+            return result;
+       }
 
         /// <summary>
         /// Start Excel and open supplied workbook name, optionally activate requested sheet
@@ -413,7 +424,7 @@ namespace AimmEstimateImport
                         {
                             isTrue = (bool)parser.Compute($"{ critVal.ToString()}{criteria}", string.Empty);
                         }
-                        catch(Exception ex)
+                        catch(Exception)
                         {
                         }
                     }

@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmImport));
             this.txtStatus = new System.Windows.Forms.TextBox();
             this.lblStatus = new System.Windows.Forms.Label();
             this.btnImport = new System.Windows.Forms.Button();
@@ -46,7 +47,7 @@
             this.txtStatus.Multiline = true;
             this.txtStatus.Name = "txtStatus";
             this.txtStatus.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.txtStatus.Size = new System.Drawing.Size(1058, 123);
+            this.txtStatus.Size = new System.Drawing.Size(1058, 191);
             this.txtStatus.TabIndex = 22;
             // 
             // lblStatus
@@ -63,6 +64,7 @@
             // 
             this.btnImport.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnImport.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.btnImport.Enabled = false;
             this.btnImport.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnImport.Location = new System.Drawing.Point(1063, 61);
             this.btnImport.Margin = new System.Windows.Forms.Padding(6);
@@ -84,6 +86,7 @@
             this.txtExcelFile.Name = "txtExcelFile";
             this.txtExcelFile.Size = new System.Drawing.Size(798, 38);
             this.txtExcelFile.TabIndex = 19;
+            this.txtExcelFile.TextChanged += new System.EventHandler(this.txtExcelFile_TextChanged);
             // 
             // btnFindExcel
             // 
@@ -111,13 +114,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1204, 342);
+            this.ClientSize = new System.Drawing.Size(1204, 406);
             this.Controls.Add(this.txtStatus);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnImport);
             this.Controls.Add(this.txtExcelFile);
             this.Controls.Add(this.btnFindExcel);
             this.Controls.Add(this.label1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmImport";
             this.Text = "Import ECM to AIMM";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.frmImport_FormClosing);

@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Aimm.Logging;
 using System.IO;
 using System.Xml;
-using System.Diagnostics;
 using System.Data.SqlClient;
 using System.Data;
 
@@ -81,7 +79,8 @@ namespace AimmEstimateImport
         private int modulesInJob = 0;
         private int subModulesInJob = 0;
         private string jobID = "";
-
+        private string demo_types = "";
+        private string pool_demo_types = "";
         #endregion
 
         public clsImport()
@@ -113,6 +112,7 @@ namespace AimmEstimateImport
         /// Full path to Excel file
         /// </summary>
         public string ExcelFile { get; set; }
+
         public string SourcePath { get; set; }
 
         public string Status
@@ -248,7 +248,9 @@ namespace AimmEstimateImport
                     }
                     else
                     {
-
+                        msg = "Could not set estimate to 100%, estimate not imported";
+                        LogIt.LogError(msg);
+                        Status = msg;
                     }
 
                 }
@@ -288,6 +290,8 @@ namespace AimmEstimateImport
                 logPath = get_setting(doc, "LogFolder");
                 bool.TryParse(get_setting(doc, "ShowExcel"), out showExcel);
                 xlSheet = get_setting(doc, "WorksheetName");
+                demo_types = get_setting(doc, "DemoWorkTypes");
+                pool_demo_types = get_setting(doc, "PoolDemoWorkTypes");
 
                 string cs = get_setting(doc, "POLSQL");
                 string usr = get_string_segment(cs, "User ID=", ";");
@@ -474,7 +478,7 @@ namespace AimmEstimateImport
             }
             catch(Exception ex)
             {
-                msg = $"Error adding AIMM subcontractor module {subModuleID} to job {jobID}";
+                msg = $"Error adding AIMM subcontractor module {subModuleID} to job {jobID}: {ex.Message}";
                 LogIt.LogError(msg);
                 Status = msg;
             }
@@ -647,6 +651,52 @@ namespace AimmEstimateImport
         }
 
         /// <summary>
+        /// Returns module price allocated between in-house and contractor portions
+        /// </summary>
+        /// <param name="projectRange"></param>
+        /// <param name="manDays"></param>
+        /// <param name="mtlCost"></param>
+        /// <param name="subCost"></param>
+        /// <param name="ihModulePrice"></param>
+        /// <param name="subModulePrice"></param>
+        /// <returns>KeyValuePair of in-house and sub prices</returns>
+        private KeyValuePair<float, float> allocate_ih_and_sub(dynamic projectRange, float modulePrice, float manDays, float mtlCost, float subCost)
+        {
+            KeyValuePair<float, float> result = new KeyValuePair<float, float>(0F, 0F);
+            dynamic row = get_first_unused_project_line(projectRange);
+
+            if(row != null)
+            {
+                // get the in-house portion
+                var mdOK = set_man_days(row, manDays);
+                var mcOK = set_material_cost(row, mtlCost);
+                var ihPrice = 0F;
+                if(mdOK == manDays && mcOK == mtlCost)
+                {
+                    ihPrice = get_row_total(row);
+                    set_man_days(row, null);
+                    set_material_cost(row, null);
+                }
+
+                // get the subcontractor portion
+                var subOK = set_sub_cost(row, subCost);
+                var subPrice = 0F;
+                if(subOK == subCost)
+                {
+                    subPrice = get_row_total(row);
+                    set_sub_cost(row, null);
+                }
+
+                // if IH + SUB prices don't equal original price, adjust sub price to correct
+                if(ihPrice + subPrice != modulePrice)
+                    subPrice = modulePrice - ihPrice;
+
+                result = new KeyValuePair<float, float>(ihPrice, subPrice);
+            }
+            return result;
+        }
+
+        /// <summary>
         /// Sets ProjectFinalID to workOrderID in work order demo modules
         /// </summary>
         /// <param name="workOrderID"></param>
@@ -655,7 +705,7 @@ namespace AimmEstimateImport
         /// <returns></returns>
         private bool assign_work_order_to_modules(string workOrderID, DataTable jobModules, string connectionString)
         {
-            bool response = false;
+            bool result = false;
             msg = $"Assigning work order {workOrderID} to modules for job {jobID}";
             LogIt.LogInfo(msg);
             Status = msg;
@@ -683,7 +733,7 @@ namespace AimmEstimateImport
                                 msg = $"Added work order {workOrderID} to demo module(s) for job {jobID}";
                                 LogIt.LogInfo(msg);
                                 Status = msg;
-                                response = true;
+                                result = true;
                             }
                         }
                         conn.Close();
@@ -696,7 +746,7 @@ namespace AimmEstimateImport
                     Status = msg;
                 }
             }
-            return response;
+            return result;
         }
 
         /// <summary>
@@ -806,6 +856,33 @@ namespace AimmEstimateImport
             return response;
         }
 
+        private dynamic get_first_unused_project_line(dynamic projectRange)
+        {
+            dynamic result = null;
+            int row = projectRange.Rows.Count + 1;
+            string stepText = "";
+            try
+            {
+                while(stepText == "")
+                {
+                    row--;
+                    stepText = projectRange.Rows[row].Cells[2].Value ?? "";
+                }
+                if(row < projectRange.Rows.Count)
+                {
+                    row++;
+                    result = projectRange.Rows[row];
+                }
+            }
+            catch(Exception ex)
+            {
+                msg = $"Error getting unused project row: {ex.Message}";
+                Status = msg;
+                LogIt.LogError(msg);
+            }
+            return result;
+        }
+
         /// <summary>
         /// get customer name for supplied job number
         /// </summary>
@@ -848,10 +925,10 @@ namespace AimmEstimateImport
             switch(moduleType)
             {
                 case moduleTypes.demo:
-                    demoTypeWhere = " AND EstimateTypeID in (42)";
+                    demoTypeWhere = $" AND EstimateTypeID in ({demo_types})";
                     break;
                 case moduleTypes.poolDemo:
-                    demoTypeWhere = " AND EstimateTypeID in (45,46)";
+                    demoTypeWhere = $" AND EstimateTypeID in ({pool_demo_types})";
                     break;
                 default:
                     break;
@@ -1017,13 +1094,52 @@ namespace AimmEstimateImport
             dynamic result = null;
             try
             {
-                // get the totals & sub cost columns for the project
+                // get the totals, sub cost & aimm category columns for the project
                 dynamic totals = oXl.GetIntersect(projectRange.EntireRow, oXl.GetSecondaryRange(rangeNames["project_total_range"]));
                 dynamic subCosts = oXl.GetIntersect(projectRange.EntireRow, oXl.GetSecondaryRange(rangeNames["sub_cost_range"]));
-                if(totals != null && subCosts != null)
+                dynamic aimmCats = oXl.GetIntersect(projectRange.Entirerow, oXl.GetSecondaryRange(rangeNames["aimm_category_range"]));
+                if(totals != null && subCosts != null && aimmCats != null)
                 {
                     // get the cell containing the largest amount (exclude rows with sub cost)
-                    dynamic bigCell = oXl.GetMaxCellInRange(totals, subCosts, "=0");
+                    int maxCell = 0;
+                    float maxVal = 0;
+                    for(int i = 1; i <= totals.Cells.Count; i++)
+                    {
+                        var price = (totals.Cells[i].Value ?? 0).ToString();
+                        var sub = (subCosts.Cells[i].Value ?? 0).ToString();
+                        var cat = get_last_paren_segment((aimmCats.Cells[i].Value ?? ""));
+
+                        float val = 0;
+                        float subCost = 0;
+                        float.TryParse(price, out val);
+                        float.TryParse(sub, out subCost);
+
+                        if(subCost == 0)
+                        {
+                            if(cat == "" | !demo_types.Contains(cat))
+                            {
+                                if(cat == "" | !pool_demo_types.Contains(cat))
+                                {
+                                    if(val > maxVal)
+                                    {
+                                        maxCell = i;
+                                        maxVal = Convert.ToSingle(val);
+                                    }
+                                }
+                            }
+                        }
+
+                        //    if(subCost == 0 && !demo_types.Contains(cat) && !pool_demo_types.Contains(cat))
+                        //{
+                        //    if(val > maxVal)
+                        //    {
+                        //        maxCell = i;
+                        //        maxVal = Convert.ToSingle(val);
+                        //    }
+                        //}
+
+                    }
+                    dynamic bigCell = totals.Cells[maxCell];
                     if(bigCell != null)
                     {
                         // get the project row for the cell
@@ -1031,6 +1147,18 @@ namespace AimmEstimateImport
                         bigCell = null;
                     }
                     totals = null;
+                    subCosts = null;
+                    aimmCats = null;
+
+
+                    //dynamic bigCell = oXl.GetMaxCellInRange(totals, subCosts, "=0");
+                    //if(bigCell != null)
+                    //{
+                    //    // get the project row for the cell
+                    //    result = oXl.GetIntersect(bigCell.EntireRow, projectRange);
+                    //    bigCell = null;
+                    //}
+                    //totals = null;
                 }
             }
             catch(Exception ex)
@@ -1315,13 +1443,17 @@ namespace AimmEstimateImport
                     dynamic largestModule = null;
                     bool aModuleHasNoManDays = false;
                     float saveMtlCost = 0;
+                    float saveModulePrice = 0;
+                    string pNo = rngName.Substring(rngName.LastIndexOf("_") + 1);
+                    string modPrefix = rngName.Contains("project") ? $"P{pNo}: " : $"O{pNo}: ";
+
                     foreach(dynamic module in thisProject.Rows)
                     {
                         // process this module if it has a total price
                         float modulePrice = get_row_total(module);
                         if(modulePrice != 0)
                         {
-                            string modDesc = module.Cells(2).Value;
+                            string modDesc = modPrefix + module.Cells(2).Value;
                             float manDays = get_man_days(module);
                             float mtlCost = get_material_cost(module);
                             float subCost = get_sub_cost(module);
@@ -1339,15 +1471,22 @@ namespace AimmEstimateImport
                                 largestModule = get_largest_in_house_module(thisProject);
                                 aModuleHasNoManDays = (largestModule != null);
                                 if(aModuleHasNoManDays)
+                                {
                                     saveMtlCost = mtlCost;
+                                    saveModulePrice = modulePrice;
+                                }
                             }
                             else
                             {
-                                // if we're saving a materials-only cost and this is largest row, add it to this row's cost
-                                if(aModuleHasNoManDays && saveMtlCost != 0 && module.Address == largestModule.Address)
+                                // if we're saving a materials-only cost/price and this is 
+                                // the largest row, add them to this row's cost/price
+                                if(aModuleHasNoManDays && saveMtlCost != 0 && saveModulePrice != 0
+                                   && module.Address == largestModule.Address)
                                 {
                                     mtlCost += saveMtlCost;
+                                    modulePrice += saveModulePrice;
                                     saveMtlCost = 0;
+                                    saveModulePrice = 0;
                                     aModuleHasNoManDays = false;
                                     largestModule = null;
                                 }
@@ -1374,20 +1513,33 @@ namespace AimmEstimateImport
                                 // get estimate type from aimm category
                                 int estTypeID = get_estimate_type(module);
 
+
+                                // if in-house AND sub, allocate price between them,
+                                // with IH portion getting the materials cost
+                                float ihModulePrice = isIhOnly ? modulePrice : 0;
+                                float subModulePrice = isSubOnly ? modulePrice : 0;
+                                float subMtlCost = isSubOnly ? mtlCost : 0;
+                                if(isIhAndSub)
+                                {
+                                    KeyValuePair<float, float> prices =
+                                        allocate_ih_and_sub(thisProject, modulePrice, manDays, mtlCost, subCost);
+                                    ihModulePrice = prices.Key;
+                                    subModulePrice = prices.Value;
+                                }
+
                                 // add the standard module if needed
                                 if(isIhOnly || isIhAndSub)
                                 {
                                     modulesInJob++;
-                                    moduleID = add_aimm_module(custID, modulesInJob, modDesc, manDays, mtlCost, modulePrice, estTypeID, salesRep, estimator, laborRate, burdenRate, commRate, connString);
+                                    moduleID = add_aimm_module(custID, modulesInJob, modDesc, manDays, mtlCost, ihModulePrice, estTypeID, salesRep, estimator, laborRate, burdenRate, commRate, connString);
 
                                 }
                                 // add the sub module if needed
                                 if(isSubOnly || isIhAndSub)
                                 {
                                     // if this module has any in-house material cost, none of it goes here, it all goes to IH module
-                                    float subMtlCost = isSubOnly ? mtlCost : 0;
                                     subModulesInJob++;
-                                    subModuleID = add_aimm_sub_module(custID, subModulesInJob, modDesc, subMtlCost, subCost, modulePrice, estTypeID, salesRep, commRate, connString);
+                                    subModuleID = add_aimm_sub_module(custID, subModulesInJob, modDesc, subMtlCost, subCost, subModulePrice, estTypeID, salesRep, commRate, connString);
 
                                 }
                             }
@@ -1511,6 +1663,91 @@ namespace AimmEstimateImport
             }
             return response;
         }
+
+        /// <summary>
+        /// Sets project row man days, returns value set if successful.
+        /// </summary>
+        /// <param name="row">The project row to set</param>
+        /// <param name="value">The value to set or null to clear value</param>
+        /// <returns></returns>
+        private float? set_man_days(dynamic row, float? value)
+        {
+            float? result = -.01234F;
+            try
+            {
+                dynamic cell = oXl.GetIntersect(row.EntireRow, oXl.GetSecondaryRange(rangeNames["man_days_range"]));
+                if(value == null)
+                    cell.ClearContents();
+                else
+                    cell.Value = value;
+                cell = null;
+                result = value;
+            }
+            catch(Exception ex)
+            {
+                msg = $"Error setting row man days: {ex.Message}";
+                Status = msg;
+                LogIt.LogError(msg);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Sets project row material cost, returns value set if successful.
+        /// </summary>
+        /// <param name="row">The project row to set</param>
+        /// <param name="value">The value to set or null to clear value</param>
+        /// <returns></returns>
+        private float? set_material_cost(dynamic row, float? value)
+        {
+            float? result = -.01234F;
+            try
+            {
+                dynamic cell = oXl.GetIntersect(row.EntireRow, oXl.GetSecondaryRange(rangeNames["material_cost_range"]));
+                if(value == null)
+                    cell.ClearContents();
+                else
+                    cell.Value = value;
+                cell = null;
+                result = value;
+            }
+            catch(Exception ex)
+            {
+                msg = $"Error setting row material cost: {ex.Message}";
+                Status = msg;
+                LogIt.LogError(msg);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Sets project row subcontractor cost, returns value set if successful.
+        /// </summary>
+        /// <param name="row">The project row to set</param>
+        /// <param name="value">The value to set or null to clear value</param>
+        /// <returns></returns>
+        private float? set_sub_cost(dynamic row, float? value)
+        {
+            float? result = -.01234F;
+            try
+            {
+                dynamic cell = oXl.GetIntersect(row.EntireRow, oXl.GetSecondaryRange(rangeNames["sub_cost_range"]));
+                if(value == null)
+                    cell.ClearContents();
+                else
+                    cell.Value = value;
+                cell = null;
+                result = value;
+            }
+            catch(Exception ex)
+            {
+                msg = $"Error setting row material cost: {ex.Message}";
+                Status = msg;
+                LogIt.LogError(msg);
+            }
+            return result;
+        }
+
 
         /// <summary>
         /// Sort list of projects and options

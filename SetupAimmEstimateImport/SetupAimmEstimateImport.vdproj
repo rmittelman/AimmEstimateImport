@@ -15,31 +15,25 @@
     {
         "Entry"
         {
-        "MsmKey" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_26A26661E0944F97A456B5D5D3CCF604"
+        "MsmKey" = "8:_0E6B0E5BC53E451CA8B7F71A1A7832DC"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_35324FC12592A77FC81A4F39D19785CC"
-        "OwnerKey" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
+        "OwnerKey" = "8:_C94567BA9648487D96F3200FCC630E1C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_99A019425A51B0062106D81FFE61F01D"
-        "OwnerKey" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
+        "OwnerKey" = "8:_C94567BA9648487D96F3200FCC630E1C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_C30A171127F64E758A27771CC99546D6"
+        "MsmKey" = "8:_C94567BA9648487D96F3200FCC630E1C"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -52,19 +46,13 @@
         "Entry"
         {
         "MsmKey" = "8:_FA4706E08AFD60E377FB4BFB8BD1B402"
-        "OwnerKey" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
+        "OwnerKey" = "8:_C94567BA9648487D96F3200FCC630E1C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_99A019425A51B0062106D81FFE61F01D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
+        "OwnerKey" = "8:_C94567BA9648487D96F3200FCC630E1C"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -77,6 +65,12 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_FA4706E08AFD60E377FB4BFB8BD1B402"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_99A019425A51B0062106D81FFE61F01D"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -97,6 +91,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
+            }
         }
         "Release"
         {
@@ -113,6 +123,22 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+                "Items"
+                {
+                    "{EDC2488A-8267-493A-A98E-7D9C3B36CDF3}:.NETFramework,Version=v4.5"
+                    {
+                    "Name" = "8:Microsoft .NET Framework 4.5 (x86 and x64)"
+                    "ProductCode" = "8:.NETFramework,Version=v4.5"
+                    }
+                }
+            }
         }
     }
     "Deployable"
@@ -134,7 +160,7 @@
                 {
                 "Name" = "8:.NET Framework"
                 "Message" = "8:[VSDNETMSG]"
-                "FrameworkVersion" = "8:.NETFramework,Version=v4.5"
+                "FrameworkVersion" = "8:.NETFramework,Version=v4.6.1"
                 "AllowLaterVersions" = "11:FALSE"
                 "InstallUrl" = "8:http://go.microsoft.com/fwlink/?LinkId=395269"
                 }
@@ -142,7 +168,7 @@
         }
         "File"
         {
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_26A26661E0944F97A456B5D5D3CCF604"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0E6B0E5BC53E451CA8B7F71A1A7832DC"
             {
             "SourcePath" = "8:..\\AimmEstimateImport\\bin\\Debug\\Settings.xml"
             "TargetName" = "8:Settings.xml"
@@ -224,26 +250,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_C30A171127F64E758A27771CC99546D6"
-            {
-            "SourcePath" = "8:C:\\Users\\RonM\\Downloads\\import_excel.ico"
-            "TargetName" = "8:import_excel.ico"
-            "Tag" = "8:"
-            "Folder" = "8:_AAE26877397940848DB630C962B9EC2A"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_FA4706E08AFD60E377FB4BFB8BD1B402"
             {
             "AssemblyRegister" = "3:1"
@@ -283,7 +289,7 @@
         {
             "{994432C3-9487-495D-8656-3E829A8DBDDE}:_21AA925CA5D44267BC61030775F4F4E1"
             {
-            "DefaultLocation" = "8:[CommonAppDataFolder][Manufacturer\\[ProductName]"
+            "DefaultLocation" = "8:[CommonAppDataFolder][Manufacturer]\\[ProductName]\\[ProductVersion]"
             "Name" = "8:Application's Data Folder"
             "AlwaysCreate" = "11:FALSE"
             "Condition" = "8:"
@@ -354,15 +360,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AimmEstimateImport"
-        "ProductCode" = "8:{68628C9E-ED5C-4DE5-A6F6-A1F5EABC50AC}"
-        "PackageCode" = "8:{AC4871B1-227A-4CD8-A811-1C3F715A04B1}"
+        "ProductCode" = "8:{C267974C-ABAD-413A-A480-BC35BB6AD77D}"
+        "PackageCode" = "8:{2DC4E8C9-1BCE-4AE0-9F6E-007D0B7425D6}"
         "UpgradeCode" = "8:{8474520B-19B7-4196-BA93-A66B26DF9920}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
-        "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "InstallAllUsers" = "11:TRUE"
+        "ProductVersion" = "8:1.0.5"
         "Manufacturer" = "8:POL"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -475,32 +481,32 @@
         }
         "Shortcut"
         {
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_580F980F47A348BA8CC75C5B57E6E1D9"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_AB750A0703064F9FAF3DE1C378481124"
             {
             "Name" = "8:Aimm Estimate Import"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:32512"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
+            "Target" = "8:_C94567BA9648487D96F3200FCC630E1C"
             "Folder" = "8:_FBEBA63054714B6BA380B9CB79541DF9"
             "WorkingFolder" = "8:_AAE26877397940848DB630C962B9EC2A"
-            "Icon" = "8:_C30A171127F64E758A27771CC99546D6"
+            "Icon" = "8:_C94567BA9648487D96F3200FCC630E1C"
             "Feature" = "8:"
             }
-            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_892E011B51284C0EB49F018333AE1653"
+            "{970C0BB2-C7D0-45D7-ABFA-7EC378858BC0}:_D6B78168BACF4932A2CB752035996CA1"
             {
             "Name" = "8:Aimm Estimate Import"
             "Arguments" = "8:"
             "Description" = "8:"
             "ShowCmd" = "3:1"
-            "IconIndex" = "3:0"
+            "IconIndex" = "3:32512"
             "Transitive" = "11:FALSE"
-            "Target" = "8:_0B5AC95C6B524A22A691125BC5F0D231"
+            "Target" = "8:_C94567BA9648487D96F3200FCC630E1C"
             "Folder" = "8:_5D0ED9775DFA4670BC858C80DD69FE80"
             "WorkingFolder" = "8:_AAE26877397940848DB630C962B9EC2A"
-            "Icon" = "8:_C30A171127F64E758A27771CC99546D6"
+            "Icon" = "8:_C94567BA9648487D96F3200FCC630E1C"
             "Feature" = "8:"
             }
         }
@@ -902,7 +908,7 @@
         }
         "ProjectOutput"
         {
-            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_0B5AC95C6B524A22A691125BC5F0D231"
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_C94567BA9648487D96F3200FCC630E1C"
             {
             "SourcePath" = "8:..\\AimmEstimateImport\\obj\\Debug\\AimmEstimateImport.exe"
             "TargetName" = "8:"

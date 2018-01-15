@@ -1,27 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.IO;
 using System.Security.Cryptography;
 
 namespace AimmEstimateImport
 {
+    /// <summary>
+    /// Provides text encryption / decryption functionality
+    /// </summary>
     public static class clsCrypto
     {
-        public const String strPermutation = "ouiveyxaqtd";
-        public const Int32 bytePermutation1 = 0x19;
-        public const Int32 bytePermutation2 = 0x59;
-        public const Int32 bytePermutation3 = 0x17;
-        public const Int32 bytePermutation4 = 0x41;
-
         /// <summary>
         /// Encrypt a text string
         /// </summary>
         /// <param name="text">Text to encrypt.</param>
-        /// <param name="password">Optional. If used, must be used to decrypt.</param>
+        /// <param name="password">Optional. If used, must also be used to decrypt the text.</param>
         /// <remarks>Uses a default 8-byte seed.</remarks>
-        /// <returns></returns>
+        /// <returns>Encrypted value of text</returns>
         public static string Encrypt(string text, string password = "")
         {
             if(password == "")
@@ -33,9 +28,9 @@ namespace AimmEstimateImport
         /// Decrypt a text string
         /// </summary>
         /// <param name="text">Text to decrypt.</param>
-        /// <param name="password">Optional. If used to encrypt, must be used to decrypt.</param>
+        /// <param name="password">Optional. If it was used to encrypt text, must also be used to decrypt.</param>
         /// <remarks>Uses a default 8-byte seed.</remarks>
-        /// <returns></returns>
+        /// <returns>Decrypted value of text</returns>
         public static string Decrypt(string text, string password = "")
         {
             if(password == "")
@@ -64,7 +59,6 @@ namespace AimmEstimateImport
                                 cs.Close();
                                 return ms.ToArray();
                             }
-
                         }
                         catch(Exception)
                         {
