@@ -58,7 +58,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_35324FC12592A77FC81A4F39D19785CC"
+        "OwnerKey" = "8:_99A019425A51B0062106D81FFE61F01D"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -70,7 +70,7 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_99A019425A51B0062106D81FFE61F01D"
+        "OwnerKey" = "8:_35324FC12592A77FC81A4F39D19785CC"
         "MsmSig" = "8:_UNDEFINED"
         }
     }
@@ -195,11 +195,6 @@
             "AssemblyAsmDisplayName" = "8:Aimm.Logging, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_35324FC12592A77FC81A4F39D19785CC"
-                    {
-                    "Name" = "8:Aimm.Logging.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Aimm.Logging.dll"
             "TargetName" = "8:"
@@ -226,11 +221,6 @@
             "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_99A019425A51B0062106D81FFE61F01D"
-                    {
-                    "Name" = "8:System.Net.Http.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Net.Http.dll"
             "TargetName" = "8:"
@@ -257,11 +247,6 @@
             "AssemblyAsmDisplayName" = "8:log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_FA4706E08AFD60E377FB4BFB8BD1B402"
-                    {
-                    "Name" = "8:log4net.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:log4net.dll"
             "TargetName" = "8:"
@@ -360,15 +345,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AimmEstimateImport"
-        "ProductCode" = "8:{C267974C-ABAD-413A-A480-BC35BB6AD77D}"
-        "PackageCode" = "8:{2DC4E8C9-1BCE-4AE0-9F6E-007D0B7425D6}"
+        "ProductCode" = "8:{83635959-16C8-4F36-BDF7-79DCC8A6C097}"
+        "PackageCode" = "8:{E3182803-F984-40CE-BFEA-852AB3880065}"
         "UpgradeCode" = "8:{8474520B-19B7-4196-BA93-A66B26DF9920}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.5"
+        "ProductVersion" = "8:1.0.7"
         "Manufacturer" = "8:POL"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

@@ -373,7 +373,7 @@ namespace AimmEstimateImport
             }
             catch(Exception ex)
             {
-                LogIt.LogError($"Error validating customer ID {custID}: {ex.Message}");
+                LogIt.LogError($"Error adding AIMM job for customer ID {custID}: {ex.Message}");
             }
 
             return result;
@@ -394,7 +394,7 @@ namespace AimmEstimateImport
             {
                 using(SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    msg = $"Adding AIMM module {estCommonID} to job {jobID}";
+                    msg = $"Adding AIMM module {estCommonID} ({modDesc})";
                     LogIt.LogInfo(msg);
                     Status = msg;
 
@@ -429,7 +429,7 @@ namespace AimmEstimateImport
             }
             catch(Exception ex)
             {
-                LogIt.LogError($"Error validating customer ID {custID}: {ex.Message}");
+                LogIt.LogError($"Error adding AIMM module {estCommonID}: {ex.Message}");
             }
             return result;
         }
@@ -447,7 +447,7 @@ namespace AimmEstimateImport
             {
                 using(SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    msg = $"Adding AIMM subcontractor module {subModuleID} to job {jobID}.";
+                    msg = $"Adding AIMM subcontractor module {subModuleID} ({modDesc}).";
                     LogIt.LogInfo(msg);
                     Status = msg;
 
@@ -478,7 +478,7 @@ namespace AimmEstimateImport
             }
             catch(Exception ex)
             {
-                msg = $"Error adding AIMM subcontractor module {subModuleID} to job {jobID}: {ex.Message}";
+                msg = $"Error adding AIMM subcontractor module {subModuleID}: {ex.Message}";
                 LogIt.LogError(msg);
                 Status = msg;
             }
@@ -557,8 +557,8 @@ namespace AimmEstimateImport
                         int rows = cmd.ExecuteNonQuery();
                         if(rows == 1)
                         {
-                            msg = $"Added work order to job {jobID}";
-                            LogIt.LogInfo(msg);
+                            //msg = $"Added work order to job {jobID}";
+                            //LogIt.LogInfo(msg);
                             result = true;
                         }
                     }
@@ -629,7 +629,7 @@ namespace AimmEstimateImport
                             if(rows == 1)
                             {
                                 msg = $"Added materials for work order {workOrderID} to job {jobID}";
-                                LogIt.LogInfo(msg);
+                                //LogIt.LogInfo(msg);
                                 thisOne = true;
                                 Status = msg;
                             }
@@ -638,7 +638,7 @@ namespace AimmEstimateImport
                 }
                 catch(Exception ex)
                 {
-                    msg = $"Error adding materials for work order {workOrderID} to job {jobID}: {ex.Message}";
+                    msg = $"Error adding materials for work order {workOrderID}: {ex.Message}";
                     LogIt.LogError(msg);
                     Status = msg;
                     thisOne = false;
@@ -1474,6 +1474,9 @@ namespace AimmEstimateImport
                                 {
                                     saveMtlCost = mtlCost;
                                     saveModulePrice = modulePrice;
+                                    msg = $"Saving material cost {mtlCost} and module price {modulePrice} for later entry";
+                                    LogIt.LogInfo(msg);
+                                    Status = msg;
                                 }
                             }
                             else
@@ -1483,8 +1486,12 @@ namespace AimmEstimateImport
                                 if(aModuleHasNoManDays && saveMtlCost != 0 && saveModulePrice != 0
                                    && module.Address == largestModule.Address)
                                 {
+                                    msg = $"Applying saved material cost/price ({saveMtlCost} / {saveModulePrice}) to module cost/price ({mtlCost} / {modulePrice}";
                                     mtlCost += saveMtlCost;
                                     modulePrice += saveModulePrice;
+                                    msg += $", new cost/price = {mtlCost} / {modulePrice}";
+                                    LogIt.LogInfo(msg);
+                                    Status = msg;
                                     saveMtlCost = 0;
                                     saveModulePrice = 0;
                                     aModuleHasNoManDays = false;

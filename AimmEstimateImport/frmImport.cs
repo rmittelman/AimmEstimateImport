@@ -70,7 +70,7 @@ namespace AimmEstimateImport
             Size size = Properties.Settings.Default.wSize;
             WindowState = state == FormWindowState.Minimized ? FormWindowState.Normal : state;
             Location = location == new Point(0, 0) ? new Point(100, 100) : location;
-            Size = size == new Size(0, 0) ? new Size(1230, 413) : size;
+            Size = size == new Size(0, 0) ? new Size(1030, 400) : size;
 
             // set tooltips
             toolTip1.AutoPopDelay = 5000;
@@ -106,6 +106,7 @@ namespace AimmEstimateImport
 
         private void btnImport_Click(object sender, EventArgs e)
         {
+            btnImport.Enabled = false;
             imp.ImportECM();
         }
 
