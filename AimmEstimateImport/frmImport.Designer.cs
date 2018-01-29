@@ -35,6 +35,7 @@
             this.txtExcelFile = new System.Windows.Forms.TextBox();
             this.btnFindExcel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
+            this.lblVersion = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // txtStatus
@@ -110,11 +111,21 @@
             this.label1.TabIndex = 17;
             this.label1.Text = "Excel ECM File";
             // 
+            // lblVersion
+            // 
+            this.lblVersion.AutoSize = true;
+            this.lblVersion.Location = new System.Drawing.Point(12, 9);
+            this.lblVersion.Name = "lblVersion";
+            this.lblVersion.Size = new System.Drawing.Size(70, 25);
+            this.lblVersion.TabIndex = 23;
+            this.lblVersion.Text = "label2";
+            // 
             // frmImport
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1204, 406);
+            this.Controls.Add(this.lblVersion);
             this.Controls.Add(this.txtStatus);
             this.Controls.Add(this.lblStatus);
             this.Controls.Add(this.btnImport);
@@ -139,6 +150,7 @@
         private System.Windows.Forms.TextBox txtExcelFile;
         private System.Windows.Forms.Button btnFindExcel;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label lblVersion;
     }
 }
 

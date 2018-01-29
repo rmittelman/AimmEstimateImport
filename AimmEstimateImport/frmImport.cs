@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Drawing;
 using System.Configuration;
+using WindowsInstaller;
 
 namespace AimmEstimateImport
 {
@@ -23,8 +24,24 @@ namespace AimmEstimateImport
                 settingsPath = Path.GetDirectoryName(Application.ExecutablePath);
             else
                 settingsPath = Application.CommonAppDataPath.Remove(Application.CommonAppDataPath.LastIndexOf("."));
-                //settingsPath = Path.GetDirectoryName(Application.CommonAppDataPath);
             imp.InitClass(settingsPath);
+            string msiVersion = imp.MsiVersion;
+
+            // Check for new version
+            // Requires GetMSIVersion
+            string myVersion = Application.ProductVersion.Substring(0, Application.ProductVersion.LastIndexOf("."));
+            bool newerVersionAvailable = myVersion.CompareTo(msiVersion) < 0;
+            if(newerVersionAvailable)
+            {
+                string msg = $"You have version { myVersion}, but version { imp.MsiVersion} is available.\n\nDo you want to upgrade now?";
+                if(MessageBox.Show(msg, "New Version", MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2) == DialogResult.Yes)
+                {
+                    Process.Start(imp.SourcePath);
+                    imp = null;
+                    Environment.Exit(0);
+                }
+            }
+            this.lblVersion.Text = $"v {myVersion}";
         }
 
         ~frmImport()

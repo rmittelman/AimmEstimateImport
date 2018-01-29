@@ -2,7 +2,7 @@
 <Settings>
   <!-- use clsCrypto to encrypt, decrypt user ID and password -->
   <setting name="POLSQL" value="Data Source=POLSQL;Initial Catalog=MLG;User ID=ECsZj802nvlNZTcqIAaS8g==;Password=S65I5G19OZjF4WTvVVas9w=="/>
-  <setting name="SourceFolder" value="Z:\AIMM Automation\Estimate Import"/>
+  <setting name="SourceFolder" value="Z:\AIMM Automation\Estimate Import\Source\SetupAimmEstimateImport.msi"/>
   <setting name="ArchiveFolder" value="Z:\AIMM Automation\Estimate Import\Archive"/>
   <setting name="ErrorFolder" value="Z:\AIMM Automation\Estimate Import\Errors"/>
   <setting name="LogFolder" value="Z:\AIMM Automation\Estimate Import\Logs"/>

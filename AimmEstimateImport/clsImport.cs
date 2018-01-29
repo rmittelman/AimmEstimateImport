@@ -7,6 +7,7 @@ using System.IO;
 using System.Xml;
 using System.Data.SqlClient;
 using System.Data;
+using WindowsInstaller;
 
 namespace AimmEstimateImport
 {
@@ -113,6 +114,7 @@ namespace AimmEstimateImport
         /// </summary>
         public string ExcelFile { get; set; }
 
+        public string MsiVersion { get; set; }
         public string SourcePath { get; set; }
 
         public string Status
@@ -181,52 +183,62 @@ namespace AimmEstimateImport
                                 // get job description from projects
                                 string jobDesc = build_job_description();
 
-                                // get rates
-                                float laborRate = get_rate(rateTypes.laborRate, DateTime.Now, connString);
-                                float burdenRate = get_rate(rateTypes.burdenRate, DateTime.Now, connString);
-                                float commRate = get_rate(rateTypes.commissionRate, DateTime.Now, connString);
-
-                                // add job, import projects and options
-                                bool isOK = import_projects(custID, jobDesc, salesRep, estimator, saleDate, laborRate, burdenRate, commRate);
-
-                                // add demo work order
-                                int woNumber = 0;
-                                using(DataTable demoModules = get_job_modules(moduleTypes.demo, connString))
+                                if(jobDesc != "")
                                 {
-                                    if(demoModules.Rows.Count > 0)
+
+                                    // get rates
+                                    float laborRate = get_rate(rateTypes.laborRate, DateTime.Now, connString);
+                                    float burdenRate = get_rate(rateTypes.burdenRate, DateTime.Now, connString);
+                                    float commRate = get_rate(rateTypes.commissionRate, DateTime.Now, connString);
+
+                                    // add job, import projects and options
+                                    bool isOK = import_projects(custID, jobDesc, salesRep, estimator, saleDate, laborRate, burdenRate, commRate);
+
+                                    // add demo work order
+                                    int woNumber = 0;
+                                    using(DataTable demoModules = get_job_modules(moduleTypes.demo, connString))
                                     {
-                                        woNumber++;
-                                        isOK = add_aimm_work_order(custID, woNumber, demoModules, laborRate, burdenRate, commRate, connString);
+                                        if(demoModules.Rows.Count > 0)
+                                        {
+                                            woNumber++;
+                                            isOK = add_aimm_work_order(custID, woNumber, demoModules, laborRate, burdenRate, commRate, connString);
+                                        }
                                     }
-                                }
 
-                                // add pool demo work order
-                                using(DataTable poolDemoModules = get_job_modules(moduleTypes.poolDemo, connString))
-                                {
-                                    if(poolDemoModules.Rows.Count > 0)
+                                    // add pool demo work order
+                                    using(DataTable poolDemoModules = get_job_modules(moduleTypes.poolDemo, connString))
                                     {
-                                        woNumber++;
-                                        isOK = add_aimm_work_order(custID, woNumber, poolDemoModules, laborRate, burdenRate, commRate, connString);
+                                        if(poolDemoModules.Rows.Count > 0)
+                                        {
+                                            woNumber++;
+                                            isOK = add_aimm_work_order(custID, woNumber, poolDemoModules, laborRate, burdenRate, commRate, connString);
+                                        }
                                     }
-                                }
 
-                                // add admin module for difference between totals
-                                // use .01 man-days for time
-                                modulesInJob++;
-                                float modulePrice = totalAtDefaultPercent - totalAt100Percent;
-                                adminModuleID = add_aimm_module(custID, modulesInJob, "ADMIN MODULE", (float).01, 0, modulePrice, 4, salesRep, estimator, laborRate, burdenRate, commRate, connString);
+                                    // add admin module for difference between totals
+                                    // use .01 man-days for time
+                                    modulesInJob++;
+                                    float modulePrice = totalAtDefaultPercent - totalAt100Percent;
+                                    adminModuleID = add_aimm_module(custID, modulesInJob, "ADMIN MODULE", (float).01, 0, modulePrice, 4, salesRep, estimator, laborRate, burdenRate, commRate, connString);
 
-                                // update job totals from modules
-                                isOK = update_aimm_job_totals(connString);
-                                if(isOK)
-                                {
-                                    msg = $"AIMM job {jobID} created";
-                                    LogIt.LogInfo(msg);
-                                    Status = msg;
+                                    // update job totals from modules
+                                    isOK = update_aimm_job_totals(connString);
+                                    if(isOK)
+                                    {
+                                        msg = $"AIMM job {jobID} created";
+                                        LogIt.LogInfo(msg);
+                                        Status = msg;
+                                    }
+                                    else
+                                    {
+                                        msg = $"AIMM job {jobID} created, but totals were NOT updated. Please load job in AIMM, edit and save to refresh totals.";
+                                        LogIt.LogError(msg);
+                                        Status = msg;
+                                    }
                                 }
                                 else
                                 {
-                                    msg = $"AIMM job {jobID} created, but totals were NOT updated. Please load job in AIMM, edit and save to refresh totals.";
+                                    msg = $"No APPROVED projects were found in \"{xlFile}\", estimate not imported";
                                     LogIt.LogError(msg);
                                     Status = msg;
                                 }
@@ -285,6 +297,7 @@ namespace AimmEstimateImport
                 XmlDocument doc = new XmlDocument();
                 doc.Load(settingsFile);
                 SourcePath = get_setting(doc, "SourceFolder");
+                MsiVersion = get_msi_version(SourcePath);
                 archivePath = get_setting(doc, "ArchiveFolder");
                 errorPath = get_setting(doc, "ErrorFolder");
                 logPath = get_setting(doc, "LogFolder");
@@ -292,7 +305,6 @@ namespace AimmEstimateImport
                 xlSheet = get_setting(doc, "WorksheetName");
                 demo_types = get_setting(doc, "DemoWorkTypes");
                 pool_demo_types = get_setting(doc, "PoolDemoWorkTypes");
-
                 string cs = get_setting(doc, "POLSQL");
                 string usr = get_string_segment(cs, "User ID=", ";");
                 string pwd = get_string_segment(cs, "Password=", ";");
@@ -502,7 +514,7 @@ namespace AimmEstimateImport
             Status = msg;
 
             string cust = get_job_customer_name(connectionString);
-            string jobWorkOrderKey = $"{jobID}-W{woID.ToString("00")}";
+            string jobWorkOrderKey = $"{jobID}-{woID.ToString("00")}W";
             int coID = 1;
             DateTime createDate = DateTime.Today;
 
@@ -831,7 +843,6 @@ namespace AimmEstimateImport
             return response;
         }
 
-
         /// <summary>
         /// Returns work type from project row AIMM category
         /// </summary>
@@ -892,7 +903,7 @@ namespace AimmEstimateImport
         {
             string cust = "";
             msg = $"Getting customer for job {jobID}";
-            LogIt.LogError(msg);
+            LogIt.LogInfo(msg);
             Status = msg;
             try
             {
@@ -1225,6 +1236,30 @@ namespace AimmEstimateImport
                 msg = $"Error getting row material cost: {ex.Message}";
                 Status = msg;
                 LogIt.LogError(msg);
+            }
+            return result;
+        }
+
+        // Get MSI version.
+        // Requires: A reference to WindowsInstaller.
+        // Requires: using WindowsInstaller;
+        private string get_msi_version(string msiFile)
+        {
+            string result = "";
+            try
+            {
+                Type type = Type.GetTypeFromProgID("WindowsInstaller.Installer");
+                Installer installer = (WindowsInstaller.Installer)Activator.CreateInstance(type);
+                Database db = installer.OpenDatabase(msiFile, 0);
+                WindowsInstaller.View dv = db.OpenView("SELECT `Value` FROM `Property` WHERE `Property`='ProductVersion'");
+                Record record = null;
+                dv.Execute(record);
+                record = dv.Fetch();
+                result = record.get_StringData(1).ToString();
+            }
+            catch(Exception ex)
+            {
+
             }
             return result;
         }
