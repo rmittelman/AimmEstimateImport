@@ -49,6 +49,7 @@ namespace AimmEstimateImport
             { "estimator", "ESTIMATOR" },
             { "sale_date", "sale_date" },
             { "job_total", "specs_job_total" },
+            { "approved_total", "specs_approved_total" },
             { "percent_hours" ,"specs_percent_hours" },
             { "man_days_range", "specs_proj_man_days" },
             { "material_cost_range", "specs_proj_material_cost" },
@@ -139,16 +140,26 @@ namespace AimmEstimateImport
                 LogIt.LogInfo(msg);
 
                 // get job total, continue if valid
+                float defaultPercent = get_job_percent();
                 float totalAtDefaultPercent = get_job_total();
+                float totalAt100Percent;
                 if(totalAtDefaultPercent > 0)
                 {
-
                     // get total at 100%
                     // later we will add an extra module to AIMM job for difference
-                    if(set_job_percent(100))
+                    if(defaultPercent == 100)
                     {
-                        float totalAt100Percent = get_job_total();
+                        isValid = true;
+                        totalAt100Percent = totalAtDefaultPercent;
+                    }
+                    else
+                    {
+                        isValid = set_job_percent(100);
+                        totalAt100Percent = get_job_total();
+                    }
 
+                    if(isValid)
+                    {
                         // continue if valid customer
                         int custID = 0;
                         var id = oXl.GetSecondaryRange(rangeNames["cust_id"]).Value;
@@ -219,7 +230,8 @@ namespace AimmEstimateImport
                                     // use .01 man-days for time
                                     modulesInJob++;
                                     float modulePrice = totalAtDefaultPercent - totalAt100Percent;
-                                    adminModuleID = add_aimm_module(custID, modulesInJob, "ADMIN MODULE", (float).01, 0, modulePrice, 4, salesRep, estimator, laborRate, burdenRate, commRate, connString);
+                                    if(modulePrice != 0)
+                                        adminModuleID = add_aimm_module(custID, modulesInJob, "ADMIN MODULE", (float).01, 0, modulePrice, 4, salesRep, estimator, laborRate, burdenRate, commRate, connString);
 
                                     // update job totals from modules
                                     isOK = update_aimm_job_totals(connString);
@@ -1081,11 +1093,28 @@ namespace AimmEstimateImport
         /// <summary>
         /// Gets job total at currently set percent level
         /// </summary>
+        /// <returns>Percent expressed as number (ex: 100, 98.5). Actual cell value is multiplied by 100 before returning.</returns>
+        private float get_job_percent()
+        {
+            float result = 0;
+            dynamic cell = oXl.GetSecondaryRange(rangeNames["percent_hours"]);
+            if(cell != null)
+            {
+                var temp = cell.Value;
+                float.TryParse(temp.ToString(), out result);
+            }
+            cell = null;
+            return result * 100;
+        }
+
+        /// <summary>
+        /// Gets job total at currently set percent level
+        /// </summary>
         /// <returns></returns>
         private float get_job_total()
         {
             float result = 0;
-            dynamic cell = oXl.GetSecondaryRange(rangeNames["job_total"]);
+            dynamic cell = oXl.GetSecondaryRange(rangeNames["approved_total"]);
             if(cell != null)
             {
                 var temp = cell.Value;
