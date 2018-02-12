@@ -195,11 +195,6 @@
             "AssemblyAsmDisplayName" = "8:Aimm.Logging, Version=1.0.0.0, Culture=neutral, processorArchitecture=x86"
                 "ScatterAssemblies"
                 {
-                    "_35324FC12592A77FC81A4F39D19785CC"
-                    {
-                    "Name" = "8:Aimm.Logging.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:Aimm.Logging.dll"
             "TargetName" = "8:"
@@ -226,11 +221,6 @@
             "AssemblyAsmDisplayName" = "8:System.Net.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
                 "ScatterAssemblies"
                 {
-                    "_99A019425A51B0062106D81FFE61F01D"
-                    {
-                    "Name" = "8:System.Net.Http.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:System.Net.Http.dll"
             "TargetName" = "8:"
@@ -257,11 +247,6 @@
             "AssemblyAsmDisplayName" = "8:log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL"
                 "ScatterAssemblies"
                 {
-                    "_FA4706E08AFD60E377FB4BFB8BD1B402"
-                    {
-                    "Name" = "8:log4net.dll"
-                    "Attributes" = "3:512"
-                    }
                 }
             "SourcePath" = "8:log4net.dll"
             "TargetName" = "8:"
@@ -360,15 +345,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AimmEstimateImport"
-        "ProductCode" = "8:{CD548E3D-2358-4AF6-899B-EA2A08FB0AD7}"
-        "PackageCode" = "8:{15E6E568-3B26-45EE-A25A-872D1BF94542}"
+        "ProductCode" = "8:{75735243-574A-4305-B31E-2769B9296DD7}"
+        "PackageCode" = "8:{126A39E5-9DE6-4FCD-BEBF-A01B58AD87C5}"
         "UpgradeCode" = "8:{8474520B-19B7-4196-BA93-A66B26DF9920}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.0.8"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:POL"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

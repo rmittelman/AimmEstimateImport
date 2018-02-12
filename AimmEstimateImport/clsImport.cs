@@ -139,64 +139,63 @@ namespace AimmEstimateImport
                 Status = msg;
                 LogIt.LogInfo(msg);
 
-                // get job total, continue if valid
-                float defaultPercent = get_job_percent();
-                float totalAtDefaultPercent = get_job_total();
-                float totalAt100Percent;
-                if(totalAtDefaultPercent > 0)
+                // get job description from projects and verify projects
+                // are approved. continue if any projects are approved
+                string jobDesc = build_job_description();
+                if(jobDesc != "")
                 {
-                    // get total at 100%
-                    // later we will add an extra module to AIMM job for difference
-                    if(defaultPercent == 100)
+                    // get job total, continue if valid
+                    float defaultPercent = get_job_percent();
+                    float totalAtDefaultPercent = get_job_total();
+                    float totalAt100Percent;
+                    if(totalAtDefaultPercent > 0)
                     {
-                        isValid = true;
-                        totalAt100Percent = totalAtDefaultPercent;
-                    }
-                    else
-                    {
-                        isValid = set_job_percent(100);
-                        totalAt100Percent = get_job_total();
-                    }
-
-                    if(isValid)
-                    {
-                        // continue if valid customer
-                        int custID = 0;
-                        var id = oXl.GetSecondaryRange(rangeNames["cust_id"]).Value;
-                        int.TryParse((id ?? "").ToString(), out custID);
-                        if(custID != 0 && is_valid_aimm_cust(custID, connString))
+                        // get total at 100%
+                        // later we will add an extra module to AIMM job for difference
+                        if(defaultPercent == 100)
                         {
+                            isValid = true;
+                            totalAt100Percent = totalAtDefaultPercent;
+                        }
+                        else
+                        {
+                            isValid = set_job_percent(100);
+                            totalAt100Percent = get_job_total();
+                        }
 
-                            // continue if valid salesman, estimator, sale date
-                            int salesRep = 0;
-                            int estimator = 0;
-                            var sr = oXl.GetSecondaryRange(rangeNames["sales_rep"]).Value ?? "";
-                            var est = oXl.GetSecondaryRange(rangeNames["estimator"]).Value ?? "";
-                            int.TryParse(get_last_paren_segment(sr), out salesRep);
-                            int.TryParse(get_last_paren_segment(est), out estimator);
-
-                            bool isValidDate = false;
-                            DateTime saleDate;
-                            dynamic sd = oXl.GetSecondaryRange(rangeNames["sale_date"]);
-                            try
+                        if(isValid)
+                        {
+                            // continue if valid customer
+                            int custID = 0;
+                            var id = oXl.GetSecondaryRange(rangeNames["cust_id"]).Value;
+                            int.TryParse((id ?? "").ToString(), out custID);
+                            if(custID != 0 && is_valid_aimm_cust(custID, connString))
                             {
-                                // using value2 for date because it returns excel OA date
-                                saleDate = DateTime.FromOADate(sd.Value2);
-                                isValidDate = true;
-                            }
-                            catch(Exception)
-                            {
-                                isValidDate = DateTime.TryParse(sd.Value, out saleDate);
-                            }
 
-                            if(isValidDate && salesRep != 0 && estimator != 0)
-                            {
-                                // get job description from projects
-                                string jobDesc = build_job_description();
+                                // continue if valid salesman, estimator, sale date
+                                int salesRep = 0;
+                                int estimator = 0;
+                                var sr = oXl.GetSecondaryRange(rangeNames["sales_rep"]).Value ?? "";
+                                var est = oXl.GetSecondaryRange(rangeNames["estimator"]).Value ?? "";
+                                int.TryParse(get_last_paren_segment(sr), out salesRep);
+                                int.TryParse(get_last_paren_segment(est), out estimator);
 
-                                if(jobDesc != "")
+                                bool isValidDate = false;
+                                DateTime saleDate;
+                                dynamic sd = oXl.GetSecondaryRange(rangeNames["sale_date"]);
+                                try
                                 {
+                                    // using value2 for date because it returns excel OA date
+                                    saleDate = DateTime.FromOADate(sd.Value2);
+                                    isValidDate = true;
+                                }
+                                catch(Exception)
+                                {
+                                    isValidDate = DateTime.TryParse(sd.Value, out saleDate);
+                                }
 
+                                if(isValidDate && salesRep != 0 && estimator != 0)
+                                {
                                     // get rates
                                     float laborRate = get_rate(rateTypes.laborRate, DateTime.Now, connString);
                                     float burdenRate = get_rate(rateTypes.burdenRate, DateTime.Now, connString);
@@ -247,32 +246,33 @@ namespace AimmEstimateImport
                                         LogIt.LogError(msg);
                                         Status = msg;
                                     }
+
                                 }
                                 else
                                 {
-                                    msg = $"No APPROVED projects were found in \"{xlFile}\", estimate not imported";
+                                    msg = $"Invalid Sale Date (\"{sd.Value ?? ""}\"), Sales Rep (\"{sr}\") or Estimator (\"{est}\"), estimate not imported";
                                     LogIt.LogError(msg);
                                     Status = msg;
                                 }
-
                             }
                             else
                             {
-                                msg = $"Invalid Sale Date (\"{sd.Value ?? ""}\"), Sales Rep (\"{sr}\") or Estimator (\"{est}\"), estimate not imported";
+                                msg = $"Could not validate customer ID {custID}, estimate not imported";
                                 LogIt.LogError(msg);
                                 Status = msg;
                             }
                         }
                         else
                         {
-                            msg = $"Could not validate customer ID {custID}, estimate not imported";
+                            msg = "Could not set estimate to 100%, estimate not imported";
                             LogIt.LogError(msg);
                             Status = msg;
                         }
+
                     }
                     else
                     {
-                        msg = "Could not set estimate to 100%, estimate not imported";
+                        msg = $"Invalid job total ({totalAtDefaultPercent.ToString("$#0.00")}), estimate not imported";
                         LogIt.LogError(msg);
                         Status = msg;
                     }
@@ -280,11 +280,10 @@ namespace AimmEstimateImport
                 }
                 else
                 {
-                    msg = $"Invalid job total ({totalAtDefaultPercent.ToString("$#0.00")}), estimate not imported";
+                    msg = $"No APPROVED projects were found in \"{xlFile}\", estimate not imported";
                     LogIt.LogError(msg);
                     Status = msg;
                 }
-
 
                 isValid = oXl.CloseWorkbook();
                 oXl.CloseExcel();
